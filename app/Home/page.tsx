@@ -5,13 +5,15 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 
 const Home = () => {
-  const [money, setMoney] = useState(() => {
-    // Récupérer le solde initial depuis LocalStorage, ou 0 si aucune valeur n'est présente
-    const savedMoney = localStorage.getItem("savedMoney");
-    return savedMoney ? parseFloat(savedMoney) : 0;
-  });
-
+  const [money, setMoney] = useState(0);
   const [inputValue, setInputValue] = useState("");
+  useEffect(() => {
+    // Lorsque le composant est monté, récupérer le solde depuis localStorage s'il existe
+    const savedMoney = localStorage.getItem("savedMoney");
+    if (savedMoney) {
+      setMoney(parseFloat(savedMoney));
+    }
+  }, []);
 
   const handleInputChange = (event: { target: { value: any } }) => {
     const value = event.target.value;
@@ -34,22 +36,7 @@ const Home = () => {
     setMoney(0);
     localStorage.removeItem("savedMoney"); // Supprimer le solde sauvegardé dans LocalStorage
   };
-
-  useEffect(() => {
-    // Ajouter un écouteur d'événement pour gérer les changements de stockage local
-    const handleStorageChange = () => {
-      const savedMoney = localStorage.getItem("savedMoney");
-      if (savedMoney !== null) {
-        setMoney(parseFloat(savedMoney));
-      }
-    };
-
-    window.addEventListener("storage", handleStorageChange);
-
-    return () => {
-      window.removeEventListener("storage", handleStorageChange);
-    };
-  }, []); // Effectuer l'effet seulement une fois à l'initialisation
+  // Effectuer l'effet seulement une fois à l'initialisation
 
   return (
     <div className="flex flex-col items-center mt-12 ">
