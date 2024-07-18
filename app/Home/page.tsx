@@ -31,7 +31,10 @@ const Home = () => {
       const margin = 10; // Margin in pixels
       const desiredWidth = container.offsetWidth - 2 * margin; // Width of the container minus left and right margin
 
-      const moneyElement = container.querySelector("#money-text"); // Select money text element
+      const moneyElement = container.querySelector(
+        "#money-text"
+      ) as HTMLElement | null; // Cast to HTMLElement
+
       if (moneyElement) {
         let fontSize = 100; // Initial font size, adjust as needed
         moneyElement.style.fontSize = `${fontSize}px`; // Set initial font size
