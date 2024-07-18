@@ -1,21 +1,51 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 
 const Home = () => {
   const [money, setMoney] = useState(0);
   const [inputValue, setInputValue] = useState("");
+  const moneyContainerRef = useRef<HTMLDivElement>(null); // Ref for money container
+
   useEffect(() => {
-    // Lorsque le composant est monté, récupérer le solde depuis localStorage s'il existe
+    adjustFontSize(); // Call adjustFontSize on initial render
+    window.addEventListener("resize", adjustFontSize); // Adjust font size on window resize
+    return () => {
+      window.removeEventListener("resize", adjustFontSize); // Cleanup resize event listener
+    };
+  }, [money, inputValue]); // Re-run adjustFontSize when money or inputValue changes
+
+  useEffect(() => {
+    // Fetch savedMoney from localStorage on mount
     const savedMoney = localStorage.getItem("savedMoney");
     if (savedMoney) {
       setMoney(parseFloat(savedMoney));
     }
   }, []);
 
-  const handleInputChange = (event: { target: { value: any } }) => {
+  const adjustFontSize = () => {
+    if (moneyContainerRef.current) {
+      const container = moneyContainerRef.current;
+      const margin = 10; // Margin in pixels
+      const desiredWidth = container.offsetWidth - 2 * margin; // Width of the container minus left and right margin
+
+      const moneyElement = container.querySelector("#money-text"); // Select money text element
+      if (moneyElement) {
+        let fontSize = 100; // Initial font size, adjust as needed
+        moneyElement.style.fontSize = `${fontSize}px`; // Set initial font size
+
+        // Check if the money text width exceeds the container width with margin
+        while (moneyElement.offsetWidth > desiredWidth && fontSize > 0) {
+          fontSize--;
+          moneyElement.style.fontSize = `${fontSize}px`;
+        }
+      }
+    }
+  };
+
+  const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const value = event.target.value;
     if (value.length <= 4 && /^\d*\.?\d*$/.test(value)) {
       setInputValue(value);
@@ -27,39 +57,37 @@ const Home = () => {
     if (!isNaN(valueToAdd)) {
       const newMoney = money + valueToAdd;
       setMoney(newMoney);
-      localStorage.setItem("savedMoney", newMoney.toString()); // Sauvegarder le nouveau solde dans LocalStorage
+      localStorage.setItem("savedMoney", newMoney.toString());
     }
     setInputValue("");
   };
 
   const resetMoney = () => {
     setMoney(0);
-    localStorage.removeItem("savedMoney"); // Supprimer le solde sauvegardé dans LocalStorage
+    localStorage.removeItem("savedMoney");
   };
-  // Effectuer l'effet seulement une fois à l'initialisation
 
   return (
-    <div className="flex flex-col items-center mt-12 ">
+    <div className="flex flex-col items-center mt-12">
       <link
         href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap"
         rel="stylesheet"
-      ></link>
+      />
       <div id="Solde" className="mb-10">
         <div
+          ref={moneyContainerRef}
           style={{
             width: 350,
             height: 183,
             position: "relative",
             background: "rgba(96.78, 96.78, 96.78, 0)",
+            textAlign: "center", // Center the content horizontally
           }}
-          className="text-right"
         >
           <div
             style={{
               width: 350,
               height: 183,
-              left: 0,
-              top: 0,
               position: "absolute",
               background: "rgba(117.40, 117.40, 117.40, 0.50)",
               borderRadius: 25,
@@ -68,29 +96,33 @@ const Home = () => {
             }}
           />
           <div
+            id="money-text"
             style={{
-              left: 24,
-              top: 9,
-              position: "absolute",
+              margin: "0 10px", // Add 10px margin left and right
+              padding: "5px", // Add padding to better control the space
               color: "white",
               fontSize: 100,
               fontFamily: "Inter",
               fontWeight: "900",
               wordWrap: "break-word",
+              position: "absolute",
+              left: "50%",
+              transform: "translateX(-50%)",
             }}
           >
-            <h1 className="text-right">{money}€</h1>
+            {money}€
           </div>
           <div
             style={{
-              left: 168,
-              top: 130,
-              position: "absolute",
+              bottom: 10,
               color: "#747474",
               fontSize: 25,
               fontFamily: "Inter",
               fontWeight: "500",
               wordWrap: "break-word",
+              position: "absolute",
+              left: "50%",
+              transform: "translateX(-50%)",
             }}
           >
             d’économiser
@@ -118,14 +150,14 @@ const Home = () => {
           boxShadow: "0px 4px 4px rgba(0, 0, 0, 0.25)",
           border: "1px #434349 solid",
         }}
-      ></div>
+      />
       <div className="mt-12 ml">
         <Input
           type="text"
           value={inputValue}
           onChange={handleInputChange}
           placeholder="Enter amount"
-          className=" size-lg text-black"
+          className="size-lg text-black"
           style={{ width: 320 }}
         />
       </div>
