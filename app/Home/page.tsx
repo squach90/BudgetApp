@@ -128,7 +128,7 @@ const Home = () => {
               transform: "translateX(-50%)",
             }}
           >
-            d’économiser
+            d’économisé
           </div>
         </div>
         <div id="date" className="text-right mt-3 mr-4">
