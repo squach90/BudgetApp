@@ -1,6 +1,7 @@
 import Image from "next/image";
 import Home from "./Home/page";
 import { Metadata } from "next";
+import { Analytics } from "@vercel/analytics/react";
 
 export const metadata: Metadata = {
   title: "Budget Manager",
@@ -14,6 +15,7 @@ export default function Main() {
   return (
     <div>
       <Home />
+      <Analytics />
     </div>
   );
 }
